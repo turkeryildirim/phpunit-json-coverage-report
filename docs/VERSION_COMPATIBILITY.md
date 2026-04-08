@@ -31,7 +31,7 @@ The test suite is organized into three layers:
 
 - **PHPUnit 10-13 support**: The package fully supports the latest stable PHPUnit releases.
 - **Modern Extension API**: The reporter integrates with the PHPUnit 10+ Event System via `JsonReporterExtension`.
-- **Metrics Filtering**: Support for selective metric reporting (`lines`, `branches`, `paths`, `functions`, `classes`) was added in v1.1.0.
+- **Metrics Filtering**: Support for selective metric reporting (`lines`, `branches`, `paths`, `functions`, `classes`) was added in v1.0.0.
 - **Correctness testing**: Feature tests verify extractor output against php-code-coverage's own API (`numberOfExecutableLines()` etc.) to ensure no missing or extra reporting.
 - **Cross-format validation**: Integration tests compare JSON line counts against Clover XML output from the same `CodeCoverage` object.
 

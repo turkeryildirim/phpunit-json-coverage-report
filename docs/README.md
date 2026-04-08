@@ -98,11 +98,11 @@ XDEBUG_MODE=coverage vendor/bin/phpunit
 {
     "meta": {
         "format": "phpunit-json-coverage",
-        "version": "1.1.0",
+        "version": "1.0.0",
         "timestamp": "2026-04-05T12:00:00+00:00",
         "generator": {
             "name": "phpunit-json-coverage-report",
-            "version": "1.1.0"
+            "version": "1.0.0"
         },
         "phpunit": {
             "version": "13.0.6",
