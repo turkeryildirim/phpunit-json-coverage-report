@@ -140,7 +140,7 @@ jobs:
           PROJECT_NAME="phpunit-json-coverage-report"
           ZIP_NAME="${PROJECT_NAME}-${VERSION}.zip"
           zip -r "$ZIP_NAME" . -x "*.git*" "vendor/*" "tests/*" ".idea/*" "composer.lock" "phpunit.xml.dist" ".github/*"
-          echo "zip_name=$ZIP_NAME" >> $GITHUB_ENV
+          echo "ZIP_NAME=${ZIP_NAME}" >> $GITHUB_ENV
 
       - name: Create Tag and Release
         env:
