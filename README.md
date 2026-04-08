@@ -2,6 +2,42 @@
 
 Comprehensive JSON coverage reporter for PHPUnit. Reports all 5 coverage metrics: **Line**, **Branch**, **Path**, **Function**, and **Class**.
 
+## Why this package exists
+
+`PHPUnit` provides code coverage data via `php-code-coverage`, but it does not offer a native JSON output format.
+
+Existing formats such as HTML, Clover XML, or Cobertura XML are designed for human reading or specific CI tools. They are not convenient for programmatic consumption.
+
+This package fills that gap by exposing coverage data as structured JSON.
+
+---
+
+## Background
+
+There has been prior discussion about adding JSON output support directly to php-code-coverage:
+
+https://github.com/sebastianbergmann/php-code-coverage/issues/829
+
+As of now, JSON output is not available natively. This package provides an external solution.
+
+## How it works
+
+This library is implemented as a PHPUnit extension.  
+It accesses the raw coverage data during runtime and serializes it into JSON.
+
+- No XML parsing
+- No post-processing required
+- Direct access to in-memory coverage data
+---
+
+## Use Cases
+
+- CI pipelines (custom coverage checks)
+- Programmatic analysis (scripts, tooling)
+- Frontend dashboards
+- Integration with other systems
+
+
 ## Supported Versions
 
 | PHPUnit | php-code-coverage | Status |
