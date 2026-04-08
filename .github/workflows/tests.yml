@@ -1,0 +1,162 @@
+name: CI/CD Workflow
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  phpunit-tests:
+    name: PHPUnit Tests (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' ||
+      github.ref == 'refs/heads/main' ||
+      contains(github.event.head_commit.message, '#build')
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.2', '8.3', '8.4']
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, simplexml, zip, xdebug
+          coverage: xdebug
+
+      - name: Validate composer files
+        run: composer validate --no-check-publish
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction
+
+      - name: Run tests
+        run: composer test
+
+  compatibility-tests:
+    name: PHPUnit ${{ matrix.phpunit }}.x / PHP ${{ matrix.php }}
+    needs: phpunit-tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { phpunit: '10', php: '8.1' }
+          - { phpunit: '10', php: '8.2' }
+          - { phpunit: '10', php: '8.3' }
+          - { phpunit: '10', php: '8.4' }
+          - { phpunit: '11', php: '8.2' }
+          - { phpunit: '11', php: '8.3' }
+          - { phpunit: '11', php: '8.4' }
+          - { phpunit: '12', php: '8.3' }
+          - { phpunit: '12', php: '8.4' }
+          - { phpunit: '13', php: '8.4' }
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, simplexml, zip, pcov
+          coverage: pcov
+
+      - name: Validate composer files
+        run: composer validate --no-check-publish
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction
+
+      - name: Install PHPUnit ${{ matrix.phpunit }}
+        run: |
+          composer require phpunit/phpunit:^${{ matrix.phpunit }}.0 phpunit/php-code-coverage:^${{ matrix.phpunit }}.0 --with-all-dependencies --no-interaction
+
+      - name: Generate and Validate coverage report
+        run: |
+          php tests/generate-coverage.php tests/output/compat.json
+          php -r "
+          \$d = json_decode(file_get_contents('tests/output/compat.json'), true);
+          if (\$d === null) { echo 'FAIL: Invalid JSON' . PHP_EOL; exit(1); }
+          foreach (['meta','summary','files'] as \$k) {
+            if (!isset(\$d[\$k])) { echo \"FAIL: missing \$k\" . PHP_EOL; exit(1); }
+          }
+          echo 'OK: PHPUnit ' . (\$d['meta']['phpunit']['version'] ?? '?') . ' PASSED' . PHP_EOL;
+          "
+
+  release:
+    name: Create Release
+    needs: compatibility-tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine Version and Update Docs
+        id: versioning
+        run: |
+          CURRENT_VERSION=$(grep "public const VERSION" src/JsonReporter.php | cut -d"'" -f2)
+          echo "Current version: $CURRENT_VERSION"
+          
+          if [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            echo "Dependabot detected, bumping patch version..."
+            IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+            NEW_VERSION="$major.$minor.$((patch + 1))"
+            echo "New version: $NEW_VERSION"
+            
+            # Update files
+            sed -i "s/public const VERSION = '$CURRENT_VERSION';/public const VERSION = '$NEW_VERSION';/g" src/JsonReporter.php
+            sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" README.md || true
+            sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" docs/README.md || true
+            sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" docs/VERSION_COMPATIBILITY.md || true
+            
+            git add src/JsonReporter.php README.md docs/README.md docs/VERSION_COMPATIBILITY.md
+            git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+            git push
+            
+            VERSION=$NEW_VERSION
+          else
+            VERSION=$CURRENT_VERSION
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create ZIP Artifact
+        run: |
+          VERSION=${{ steps.versioning.outputs.version }}
+          PROJECT_NAME="phpunit-json-coverage-report"
+          ZIP_NAME="${PROJECT_NAME}-${VERSION}.zip"
+          zip -r "$ZIP_NAME" . -x "*.git*" "vendor/*" "tests/*" ".idea/*" "composer.lock" "phpunit.xml.dist" ".github/*"
+          echo "zip_name=$ZIP_NAME" >> $GITHUB_ENV
+
+      - name: Create Tag and Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.versioning.outputs.version }}
+          TAG="v${VERSION}"
+          
+          # Check if tag already exists
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists. Skipping release creation."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+            
+            gh release create "$TAG" "$ZIP_NAME" \
+              --title "Release $TAG" \
+              --notes "Automated release for version $VERSION"
+          fi

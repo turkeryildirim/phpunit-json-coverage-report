@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(composer install:*)",
+      "Bash(composer require:*)",
+      "Bash(composer update:*)",
+      "Bash(composer show:*)",
+      "Bash(composer dump-autoload:*)",
+      "Bash(vendor/bin/phpunit:*)",
+      "Bash(phpunit:*)",
+      "Bash(./vendor/bin/phpunit:*)",
+      "Bash(php -r ':*)",
+      "Bash(php tests/generate-coverage.php)",
+      "Bash(php tests/test-compat.php)",
+      "Bash(php tests/generate-coverage.php tests/output/verify.json)",
+      "mcp__sequential-thinking__sequentialthinking:*"
+    ]
+  }
+}

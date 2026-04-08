@@ -1,0 +1,184 @@
+{
+    "meta": {
+        "format": "phpunit-json-coverage",
+        "version": "1.0.0",
+        "timestamp": "2026-04-04T12:00:00+00:00",
+        "generator": {
+            "name": "phpunit-json-coverage-report",
+            "version": "1.0.0"
+        },
+        "phpunit": {
+            "version": "13.0.6",
+            "coverageLibrary": "13.0.2"
+        }
+    },
+    "summary": {
+        "lines": {
+            "total": 150,
+            "covered": 120,
+            "percentage": 80.0
+        },
+        "branches": {
+            "total": 40,
+            "covered": 28,
+            "percentage": 70.0
+        },
+        "paths": {
+            "total": 15,
+            "covered": 10,
+            "percentage": 66.67
+        },
+        "functions": {
+            "total": 20,
+            "covered": 16,
+            "percentage": 80.0
+        },
+        "classes": {
+            "total": 5,
+            "covered": 4,
+            "percentage": 80.0
+        }
+    },
+    "files": {
+        "src/Calculator.php": {
+            "path": "src/Calculator.php",
+            "lines": {
+                "total": 30,
+                "covered": 28,
+                "percentage": 93.33,
+                "details": {
+                    "15": { "hits": 5 },
+                    "16": { "hits": 5 },
+                    "17": { "hits": 5 },
+                    "18": { "hits": 5 },
+                    "22": { "hits": 3 },
+                    "23": { "hits": 3 },
+                    "24": { "hits": 3 },
+                    "28": { "hits": 0 },
+                    "29": { "hits": 0 }
+                }
+            },
+            "branches": {
+                "total": 4,
+                "covered": 3,
+                "percentage": 75.0,
+                "details": [
+                    {
+                        "id": 0,
+                        "line": 22,
+                        "type": "if",
+                        "covered": true
+                    },
+                    {
+                        "id": 1,
+                        "line": 28,
+                        "type": "if",
+                        "covered": false
+                    }
+                ]
+            },
+            "paths": {
+                "total": 2,
+                "covered": 1,
+                "percentage": 50.0,
+                "details": [
+                    {
+                        "id": 0,
+                        "covered": true
+                    },
+                    {
+                        "id": 1,
+                        "covered": false
+                    }
+                ]
+            },
+            "functions": {
+                "total": 3,
+                "covered": 2,
+                "percentage": 66.67,
+                "details": [
+                    {
+                        "name": "add",
+                        "signature": "int $a, int $b",
+                        "startLine": 15,
+                        "endLine": 18,
+                        "executableLines": 4,
+                        "executedLines": 4,
+                        "coverage": 100.0,
+                        "covered": true
+                    },
+                    {
+                        "name": "divide",
+                        "signature": "int $a, int $b",
+                        "startLine": 22,
+                        "endLine": 25,
+                        "executableLines": 3,
+                        "executedLines": 3,
+                        "coverage": 100.0,
+                        "covered": true
+                    },
+                    {
+                        "name": "subtract",
+                        "signature": "int $a, int $b",
+                        "startLine": 28,
+                        "endLine": 30,
+                        "executableLines": 2,
+                        "executedLines": 0,
+                        "coverage": 0.0,
+                        "covered": false
+                    }
+                ]
+            },
+            "classes": {
+                "total": 1,
+                "covered": 0,
+                "percentage": 0.0,
+                "details": [
+                    {
+                        "name": "Calculator",
+                        "type": "class",
+                        "namespace": "App\\Math",
+                        "startLine": 10,
+                        "endLine": 35,
+                        "executableLines": 30,
+                        "executedLines": 28,
+                        "coverage": 93.33,
+                        "methods": [
+                            {
+                                "name": "add",
+                                "signature": "int $a, int $b",
+                                "startLine": 15,
+                                "endLine": 18,
+                                "executableLines": 4,
+                                "executedLines": 4,
+                                "coverage": 100.0,
+                                "ccn": 1
+                            },
+                            {
+                                "name": "divide",
+                                "signature": "int $a, int $b",
+                                "startLine": 22,
+                                "endLine": 25,
+                                "executableLines": 3,
+                                "executedLines": 3,
+                                "coverage": 100.0,
+                                "ccn": 2
+                            },
+                            {
+                                "name": "subtract",
+                                "signature": "int $a, int $b",
+                                "startLine": 28,
+                                "endLine": 30,
+                                "executableLines": 2,
+                                "executedLines": 0,
+                                "coverage": 0.0,
+                                "ccn": 1
+                            }
+                        ],
+                        "covered": false
+                    }
+                ]
+            }
+        }
+    }
+}
