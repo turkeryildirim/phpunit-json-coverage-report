@@ -51,7 +51,7 @@ class LineExtractor implements CoverageExtractorInterface
             }
 
             $details[$lineNumber] = [
-                'hits' => is_array($coverage) ? count($coverage) : (int) $coverage,
+                'hits' => count($coverage),
             ];
         }
 

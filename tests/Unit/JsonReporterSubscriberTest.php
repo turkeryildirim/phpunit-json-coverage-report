@@ -33,6 +33,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\CodeCoverage;
+use ReflectionProperty;
 use Turker\PHPUnitCoverageReporter\JsonReporterSubscriber;
 
 /**
@@ -93,8 +94,9 @@ class JsonReporterSubscriberTest extends TestCase
             $this->markTestSkipped('Requires active coverage to reach the process() call');
         }
 
-        // Use an unwritable path so reporter->process() throws, exercising the catch block.
-        $subscriber = new JsonReporterSubscriber('/nonexistent/impossible/path/coverage.json', null);
+        // A regular file as parent directory makes reporter->process() throw, exercising the catch block.
+        $blocker = tempnam(sys_get_temp_dir(), 'blocker');
+        $subscriber = new JsonReporterSubscriber($blocker . '/sub/coverage.json', null);
 
         // Suppress the expected STDERR message produced by the catch block.
         stream_filter_register('null_stderr', NullStreamFilter::class);
@@ -104,9 +106,31 @@ class JsonReporterSubscriberTest extends TestCase
             $subscriber->notify($this->buildExecutionFinishedEvent());
         } finally {
             stream_filter_remove($filter);
+            @unlink($blocker);
         }
 
         $this->addToAssertionCount(1);
+    }
+
+    #[Test]
+    public function notify_does_nothing_when_coverage_is_inactive(): void
+    {
+        $outputFile = sys_get_temp_dir() . '/test-inactive-' . uniqid('', true) . '.json';
+        $subscriber = new JsonReporterSubscriber($outputFile, null);
+
+        // Temporarily replace PHPUnit's CodeCoverage singleton with a fresh, inactive instance.
+        $instance = new ReflectionProperty(CodeCoverage::class, 'instance');
+        $original = $instance->getValue();
+        $instance->setValue(null, null);
+
+        try {
+            $this->assertFalse(CodeCoverage::instance()->isActive());
+            $subscriber->notify($this->buildExecutionFinishedEvent());
+        } finally {
+            $instance->setValue(null, $original);
+        }
+
+        $this->assertFileDoesNotExist($outputFile);
     }
 
     private function buildExecutionFinishedEvent(): ExecutionFinished

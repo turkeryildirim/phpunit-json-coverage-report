@@ -115,16 +115,17 @@ class LineExtractorTest extends FeatureTestCase
     #[Test]
     public function it_skips_null_coverage_entries(): void
     {
-        $report = $this->getFixtureReport();
-        $extractor = new LineExtractor();
+        $fileNode = $this->findFileBySuffix($this->getFixtureReport(), 'LineCoverage.php');
+        $this->assertNotNull($fileNode);
 
-        foreach ($report as $node) {
-            if ($node instanceof File) {
-                $fileData = $extractor->extractFileData($node);
-                foreach ($fileData['details'] as $line => $detail) {
-                    $this->assertNotNull($detail, "Line $line should not be null");
-                }
-            }
+        // Dead code after `return` in LineCoverage::withDeadCode() is reported as null.
+        $nullLines = array_keys(array_filter($fileNode->lineCoverageData(), 'is_null'));
+        $this->assertNotEmpty($nullLines, 'Fixture should contain non-executable (null) lines');
+
+        $fileData = (new LineExtractor())->extractFileData($fileNode);
+
+        foreach ($nullLines as $line) {
+            $this->assertArrayNotHasKey($line, $fileData['details'], "Null line $line should be skipped");
         }
     }
 }

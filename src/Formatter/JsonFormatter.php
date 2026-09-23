@@ -34,7 +34,17 @@ class JsonFormatter
      */
     public function __construct(?array $extractors = null)
     {
-        $this->extractors = $extractors ?? [
+        $this->extractors = $extractors ?? self::defaultExtractors();
+    }
+
+    /**
+     * Build the default extractor set covering all 5 metrics.
+     *
+     * @return array<string, CoverageExtractorInterface>
+     */
+    private static function defaultExtractors(): array
+    {
+        return [
             'lines' => new LineExtractor(),
             'branches' => new BranchExtractor(),
             'paths' => new PathExtractor(),
@@ -69,7 +79,7 @@ class JsonFormatter
      */
     private function formatMeta(): array
     {
-        $data = [
+        return [
             'format' => 'phpunit-json-coverage',
             'version' => JsonReporter::VERSION,
             'timestamp' => date('c'),
@@ -77,17 +87,11 @@ class JsonFormatter
                 'name' => 'phpunit-json-coverage-report',
                 'version' => JsonReporter::VERSION,
             ],
+            'phpunit' => [
+                'version' => Version::id(),
+                'coverageLibrary' => \SebastianBergmann\CodeCoverage\Version::id(),
+            ],
         ];
-
-        if (class_exists(Version::class)) {
-            $data['phpunit']['version'] = Version::id();
-        }
-
-        if (class_exists(\SebastianBergmann\CodeCoverage\Version::class)) {
-            $data['phpunit']['coverageLibrary'] = \SebastianBergmann\CodeCoverage\Version::id();
-        }
-
-        return $data;
     }
 
     /**

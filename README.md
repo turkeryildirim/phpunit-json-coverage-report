@@ -67,7 +67,7 @@ Add the reporter to your `phpunit.xml`:
 
     <extensions>
         <bootstrap class="Turker\PHPUnitCoverageReporter\JsonReporterExtension">
-            <!-- Optional: Custom output path (default: coverage.json) -->
+            <!-- Optional: Custom output path (default: coverage.json); missing directories are created -->
             <parameter name="outputFile" value="coverage.json"/>
             <!-- Optional: Filter metrics (default: all) -->
             <!-- Available: lines, branches, paths, functions, classes -->

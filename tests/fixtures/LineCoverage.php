@@ -25,4 +25,11 @@ class LineCoverage
         }
         return $sum;
     }
+
+    public function withDeadCode(): int
+    {
+        return 1;
+        $unreachable = 2;
+        return $unreachable;
+    }
 }
