@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.1', '8.2', '8.3', '8.4']
+        php: ['8.1', '8.2', '8.3', '8.4', '8.5']
 
     steps:
       - uses: actions/checkout@v5
@@ -38,23 +38,28 @@ jobs:
         run: composer test
 
   compatibility-tests:
-    name: PHPUnit ${{ matrix.phpunit }}.x / PHP ${{ matrix.php }}
+    name: PHPUnit ${{ matrix.phpunit }}.x / php-code-coverage ${{ matrix.coverage }}.x / PHP ${{ matrix.php }}
     needs: phpunit-tests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { phpunit: '10', php: '8.1' }
-          - { phpunit: '10', php: '8.2' }
-          - { phpunit: '10', php: '8.3' }
-          - { phpunit: '10', php: '8.4' }
-          - { phpunit: '11', php: '8.2' }
-          - { phpunit: '11', php: '8.3' }
-          - { phpunit: '11', php: '8.4' }
-          - { phpunit: '12', php: '8.3' }
-          - { phpunit: '12', php: '8.4' }
-          - { phpunit: '13', php: '8.4' }
+          - { phpunit: '10', coverage: '10', php: '8.1' }
+          - { phpunit: '10', coverage: '10', php: '8.2' }
+          - { phpunit: '10', coverage: '10', php: '8.3' }
+          - { phpunit: '10', coverage: '10', php: '8.4' }
+          - { phpunit: '11', coverage: '11', php: '8.2' }
+          - { phpunit: '11', coverage: '11', php: '8.3' }
+          - { phpunit: '11', coverage: '11', php: '8.4' }
+          - { phpunit: '11', coverage: '11', php: '8.5' }
+          - { phpunit: '12', coverage: '12', php: '8.3' }
+          - { phpunit: '12', coverage: '12', php: '8.4' }
+          - { phpunit: '12', coverage: '12', php: '8.5' }
+          - { phpunit: '13.0', coverage: '13', php: '8.4' }
+          - { phpunit: '13.0', coverage: '13', php: '8.5' }
+          - { phpunit: '13', coverage: '14', php: '8.4' }
+          - { phpunit: '13', coverage: '14', php: '8.5' }
 
     steps:
       - uses: actions/checkout@v5
@@ -63,8 +68,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, simplexml, zip, pcov
-          coverage: pcov
+          extensions: dom, curl, libxml, mbstring, simplexml, zip, xdebug
+          coverage: xdebug
 
       - name: Validate composer files
         run: composer validate --no-check-publish
@@ -72,9 +77,12 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction
 
-      - name: Install PHPUnit ${{ matrix.phpunit }}
+      - name: Install PHPUnit ${{ matrix.phpunit }} / php-code-coverage ${{ matrix.coverage }}
         run: |
-          composer require phpunit/phpunit:^${{ matrix.phpunit }}.0 phpunit/php-code-coverage:^${{ matrix.phpunit }}.0 --with-all-dependencies --no-interaction
+          composer require phpunit/phpunit:^${{ matrix.phpunit }} phpunit/php-code-coverage:^${{ matrix.coverage }}.0 --with-all-dependencies --no-interaction
+
+      - name: Run full test suite
+        run: vendor/bin/phpunit
 
       - name: Generate and Validate coverage report
         run: |

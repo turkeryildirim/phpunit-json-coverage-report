@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Turker\PHPUnitCoverageReporter\Tests\Unit;
 
 use PHPUnit\Event\Facade as EventFacade;
-use PHPUnit\Framework\Attributes\After;
-use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Extension\Extension;
+use PHPUnit\Runner\Extension\ExtensionFacade;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Builder;
@@ -27,7 +26,6 @@ class JsonReporterExtensionTest extends TestCase
     private string $configFile;
     private ReflectionProperty $sealedProperty;
 
-    #[Before]
     protected function setUp(): void
     {
         $this->configFile = dirname(__DIR__, 2) . '/phpunit.xml.dist';
@@ -37,11 +35,9 @@ class JsonReporterExtensionTest extends TestCase
         $ef = EventFacade::instance();
         $ref = new ReflectionClass($ef);
         $this->sealedProperty = $ref->getProperty('sealed');
-        $this->sealedProperty->setAccessible(true);
         $this->sealedProperty->setValue($ef, false);
     }
 
-    #[After]
     protected function tearDown(): void
     {
         // Restore sealed state
@@ -70,7 +66,7 @@ class JsonReporterExtensionTest extends TestCase
         $config = (new Builder())->build(['--no-coverage', '--configuration', $this->configFile]);
         $this->assertFalse($config->hasCoverageReport(), 'Precondition: no coverage report expected');
 
-        $facade = new Facade();
+        $facade = $this->createExtensionFacade();
         $params = ParameterCollection::fromArray([]);
 
         // Should return without registering subscriber
@@ -87,7 +83,7 @@ class JsonReporterExtensionTest extends TestCase
         $config = (new Builder())->build(['--coverage-text', 'php://null', '--configuration', $this->configFile]);
         $this->assertTrue($config->hasCoverageReport(), 'Precondition: coverage report expected');
 
-        $facade = new Facade();
+        $facade = $this->createExtensionFacade();
         $params = ParameterCollection::fromArray([]);
 
         // Should register subscriber without exception
@@ -102,7 +98,7 @@ class JsonReporterExtensionTest extends TestCase
         $extension = new JsonReporterExtension();
 
         $config = (new Builder())->build(['--coverage-text', 'php://null', '--configuration', $this->configFile]);
-        $facade = new Facade();
+        $facade = $this->createExtensionFacade();
         $params = ParameterCollection::fromArray(['outputFile' => 'custom-output.json']);
 
         $extension->bootstrap($config, $facade, $params);
@@ -116,7 +112,7 @@ class JsonReporterExtensionTest extends TestCase
         $extension = new JsonReporterExtension();
 
         $config = (new Builder())->build(['--coverage-text', 'php://null', '--configuration', $this->configFile]);
-        $facade = new Facade();
+        $facade = $this->createExtensionFacade();
         $params = ParameterCollection::fromArray(['metrics' => 'lines,classes']);
 
         $extension->bootstrap($config, $facade, $params);
@@ -130,11 +126,19 @@ class JsonReporterExtensionTest extends TestCase
         $extension = new JsonReporterExtension();
 
         $config = (new Builder())->build(['--coverage-text', 'php://null', '--configuration', $this->configFile]);
-        $facade = new Facade();
+        $facade = $this->createExtensionFacade();
         $params = ParameterCollection::fromArray([]);
 
         $extension->bootstrap($config, $facade, $params);
 
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * PHPUnit 13.1+ turned Facade into an interface implemented by ExtensionFacade.
+     */
+    private function createExtensionFacade(): Facade
+    {
+        return class_exists(ExtensionFacade::class) ? new ExtensionFacade() : new Facade();
     }
 }

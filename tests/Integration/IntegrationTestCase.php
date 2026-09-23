@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Turker\PHPUnitCoverageReporter\Tests\Integration;
 
-use PHPUnit\Framework\Attributes\After;
-use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Driver\Selector;
@@ -52,7 +50,6 @@ abstract class IntegrationTestCase extends TestCase
         }
     }
 
-    #[Before]
     protected function setUp(): void
     {
         $this->outputDir = dirname(__DIR__) . '/output/integration-test';
@@ -61,7 +58,6 @@ abstract class IntegrationTestCase extends TestCase
         }
     }
 
-    #[After]
     protected function tearDown(): void
     {
         $files = glob($this->outputDir . '/*.json');

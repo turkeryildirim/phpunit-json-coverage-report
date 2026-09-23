@@ -17,10 +17,11 @@ $versionMatrix = [
     ['phpunit' => '^10.0', 'coverage' => '^10.0', 'label' => 'PHPUnit 10.x'],
     ['phpunit' => '^11.0', 'coverage' => '^11.0', 'label' => 'PHPUnit 11.x'],
     ['phpunit' => '^12.0', 'coverage' => '^12.0', 'label' => 'PHPUnit 12.x'],
-    ['phpunit' => '^13.0', 'coverage' => '^13.0', 'label' => 'PHPUnit 13.x'],
+    ['phpunit' => '^13.0', 'coverage' => '^13.0', 'label' => 'PHPUnit 13.0.x / php-code-coverage 13.x'],
+    ['phpunit' => '^13.0', 'coverage' => '^14.0', 'label' => 'PHPUnit 13.x / php-code-coverage 14.x'],
 ];
 
-$restoreVersion = ['phpunit' => '^13.0', 'coverage' => '^13.0'];
+$restoreVersion = ['phpunit' => '^13.0', 'coverage' => '^14.0'];
 $projectRoot = dirname(__DIR__);
 $outputDir = $projectRoot . '/tests/output/compat';
 $genScript = $projectRoot . '/tests/generate-coverage.php';
@@ -147,7 +148,7 @@ foreach ($versionMatrix as $i => $v) {
 }
 
 // 4. Restore latest version
-msg(PHP_EOL . "Restoring PHPUnit 13.x...");
+msg(PHP_EOL . "Restoring PHPUnit 13.x / php-code-coverage 14.x...");
 run("cd $projectRoot && composer require phpunit/phpunit:{$restoreVersion['phpunit']} phpunit/php-code-coverage:{$restoreVersion['coverage']} --with-all-dependencies --no-interaction -q");
 
 // 5. Summary
