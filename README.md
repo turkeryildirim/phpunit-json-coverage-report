@@ -45,7 +45,8 @@ It accesses the raw coverage data during runtime and serializes it into JSON.
 | 10.x | 10.x | ✅ Tested |
 | 11.x | 11.x | ✅ Tested |
 | 12.x | 12.x | ✅ Tested |
-| 13.x | 13.x | ✅ Tested |
+| 13.0.x | 13.x | ✅ Tested |
+| 13.1+ | 14.x | ✅ Tested |
 
 > See [Version Compatibility](docs/VERSION_COMPATIBILITY.md) for detailed test results.
 

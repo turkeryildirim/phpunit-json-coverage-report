@@ -98,15 +98,15 @@ XDEBUG_MODE=coverage vendor/bin/phpunit
 {
     "meta": {
         "format": "phpunit-json-coverage",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "timestamp": "2026-04-05T12:00:00+00:00",
         "generator": {
             "name": "phpunit-json-coverage-report",
-            "version": "1.0.0"
+            "version": "1.1.0"
         },
         "phpunit": {
-            "version": "13.0.6",
-            "coverageLibrary": "13.0.2"
+            "version": "13.3.4",
+            "coverageLibrary": "14.3.3"
         }
     }
 }
@@ -256,7 +256,7 @@ A class is covered only when **all** its methods are covered. Only classes and t
 
 - **PHP**: 8.1 or higher
 - **PHPUnit**: 10.0, 11.0, 12.0, or 13.0
-- **php-code-coverage**: Matching PHPUnit version
+- **php-code-coverage**: Matching PHPUnit version (10.x–13.x; PHPUnit 13.1+ uses php-code-coverage 14.x)
 - **Driver**: Xdebug 3.0+ or PCOV (for branch/path coverage)
 
 ## Programmatic Usage

@@ -6,6 +6,8 @@ namespace Turker\PHPUnitCoverageReporter\Tests\Integration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionMethod;
+use SebastianBergmann\CodeCoverage\Node\Directory;
 use SebastianBergmann\CodeCoverage\Report\Clover;
 use Turker\PHPUnitCoverageReporter\Formatter\JsonFormatter;
 use Turker\PHPUnitCoverageReporter\JsonReporter;
@@ -212,7 +214,12 @@ class FullReportTest extends IntegrationTestCase
 
         $data = json_decode(file_get_contents($outputFile), true);
 
-        $cloverXml = (new Clover())->process(self::$sharedFullCoverage);
+        // php-code-coverage 14 changed Clover::process() to take the report Directory node.
+        $cloverParam = (new ReflectionMethod(Clover::class, 'process'))->getParameters()[0];
+        $cloverInput = $cloverParam->getType()?->getName() === Directory::class
+            ? self::$sharedFullCoverage->getReport()
+            : self::$sharedFullCoverage;
+        $cloverXml = (new Clover())->process($cloverInput);
         $xml = simplexml_load_string($cloverXml);
 
         $cloverTotal = (int) $xml->project->metrics['statements'];

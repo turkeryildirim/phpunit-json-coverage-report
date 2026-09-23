@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-PHPUnit extension that generates a comprehensive JSON coverage report covering all 5 metrics: **line, branch, path, function, class**. Supports PHPUnit 10–13 and the matching `php-code-coverage` versions.
+PHPUnit extension that generates a comprehensive JSON coverage report covering all 5 metrics: **line, branch, path, function, class**. Supports PHPUnit 10–13 and the matching `php-code-coverage` versions (10–14; PHPUnit 13.1+ uses php-code-coverage 14).
 
 ## Commands
 

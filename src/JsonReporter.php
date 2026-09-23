@@ -17,7 +17,7 @@ class JsonReporter
     /**
      * Current version of the reporter.
      */
-    public const VERSION = '1.0.1';
+    public const VERSION = '1.1.0';
 
     /**
      * @var JsonFormatter The formatter instance.

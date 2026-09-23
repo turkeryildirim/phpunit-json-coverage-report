@@ -20,6 +20,7 @@ final class NullStreamFilter extends \php_user_filter
 }
 
 
+use PHPUnit\Event\Telemetry\CpuTime;
 use PHPUnit\Event\Telemetry\Duration;
 use PHPUnit\Event\Telemetry\GarbageCollectorStatus;
 use PHPUnit\Event\Telemetry\HRTime;
@@ -116,9 +117,17 @@ class JsonReporterSubscriberTest extends TestCase
         // applicationTime, collectorTime, destructorTime, freeTime,
         // running, protected, full, bufferSize
         $gc = new GarbageCollectorStatus(0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, false, false, false, 0);
-        $snapshot = new Snapshot($time, $memory, $memory, $gc);
         $duration = Duration::fromSecondsAndNanoseconds(0, 0);
-        $telemetry = new Info($snapshot, $duration, $memory, $duration, $memory);
+
+        // PHPUnit 13.1+ added CpuTime arguments to Snapshot (3) and Info (6).
+        if (class_exists(CpuTime::class)) {
+            $cpu = CpuTime::fromSecondsAndNanoseconds(0, 0);
+            $snapshot = new Snapshot($time, $memory, $memory, $gc, $cpu, $cpu, $cpu);
+            $telemetry = new Info($snapshot, $duration, $memory, $duration, $memory, $cpu, $cpu, $cpu, $cpu, $cpu, $cpu);
+        } else {
+            $snapshot = new Snapshot($time, $memory, $memory, $gc);
+            $telemetry = new Info($snapshot, $duration, $memory, $duration, $memory);
+        }
 
         return new ExecutionFinished($telemetry);
     }
