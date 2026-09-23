@@ -54,28 +54,35 @@ class ClassExtractor implements CoverageExtractorInterface
         // numberOfTestedTraits() is always 0 in the current implementation.
         $covered = $file->numberOfTestedClasses() + $file->numberOfTestedTraits();
 
-        $details = [];
-
-        foreach ($file->classes() as $name => $class) {
-            $executableLines = $this->getValue($class, 'executableLines', 0);
-            $coverage = $this->getValue($class, 'coverage', 0);
-            $isCovered = $executableLines > 0 && $coverage === 100;
-            $details[] = $this->buildDetail($name, 'class', $class, $isCovered);
-        }
-
-        foreach ($file->traits() as $name => $trait) {
-            $executableLines = $this->getValue($trait, 'executableLines', 0);
-            $coverage = $this->getValue($trait, 'coverage', 0);
-            $isCovered = $executableLines > 0 && $coverage === 100;
-            $details[] = $this->buildDetail($name, 'trait', $trait, $isCovered);
-        }
-
         return [
             'total' => $total,
             'covered' => $covered,
             'percentage' => CoverageCalculator::percentage($covered, $total),
-            'details' => $details,
+            'details' => [
+                ...$this->extractDetails($file->classes(), 'class'),
+                ...$this->extractDetails($file->traits(), 'trait'),
+            ],
         ];
+    }
+
+    /**
+     * Build detail entries for a set of classes or traits.
+     *
+     * @param iterable $items Iterable of class/trait coverage data keyed by name.
+     * @param string $type The type ('class' or 'trait').
+     * @return array List of formatted detail entries.
+     */
+    private function extractDetails(iterable $items, string $type): array
+    {
+        $details = [];
+
+        foreach ($items as $name => $data) {
+            $isCovered = $this->getValue($data, 'executableLines', 0) > 0
+                && $this->getValue($data, 'coverage', 0) === 100;
+            $details[] = $this->buildDetail($name, $type, $data, $isCovered);
+        }
+
+        return $details;
     }
 
     /**

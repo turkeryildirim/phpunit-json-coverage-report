@@ -153,6 +153,7 @@ abstract class FeatureTestCase extends TestCase
         $lc = new LineCoverage();
         $lc->covered();
         $lc->partiallyCovered();
+        $lc->withDeadCode();
 
         // BranchCoverage
         $bc = new BranchCoverage();

@@ -22,10 +22,26 @@ class ErrorHandlingTest extends IntegrationTestCase
     #[Test]
     public function it_throws_on_unwritable_path(): void
     {
+        $blocker = $this->outputDir . '/blocker.json';
+        file_put_contents($blocker, '');
+
         $reporter = new JsonReporter();
 
         $this->expectException(RuntimeException::class);
-        $reporter->process(self::$sharedEmptyCoverage, '/nonexistent/impossible/path/coverage.json');
+        $reporter->process(self::$sharedEmptyCoverage, $blocker . '/sub/coverage.json');
+    }
+
+    #[Test]
+    public function it_throws_when_coverage_data_cannot_be_encoded(): void
+    {
+        $formatter = $this->createStub(JsonFormatter::class);
+        $formatter->method('format')->willReturn(['invalid' => NAN]);
+
+        $reporter = new JsonReporter($formatter);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to encode coverage data to JSON');
+        $reporter->process(self::$sharedEmptyCoverage, $this->outputDir . '/never-written.json');
     }
 
     #[Test]

@@ -62,6 +62,7 @@ Add to your `phpunit.xml`:
 <extensions>
     <bootstrap class="Turker\PHPUnitCoverageReporter\JsonReporterExtension">
         <!-- Path where the report will be written (default: coverage.json) -->
+        <!-- Missing parent directories (e.g. build/) are created automatically -->
         <parameter name="outputFile" value="build/coverage.json"/>
 
         <!-- Comma-separated list of metrics to include (default: all) -->
@@ -98,11 +99,11 @@ XDEBUG_MODE=coverage vendor/bin/phpunit
 {
     "meta": {
         "format": "phpunit-json-coverage",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "timestamp": "2026-04-05T12:00:00+00:00",
         "generator": {
             "name": "phpunit-json-coverage-report",
-            "version": "1.1.0"
+            "version": "1.1.1"
         },
         "phpunit": {
             "version": "13.3.4",
@@ -274,7 +275,8 @@ $reporter = new JsonReporter();
 $metrics = ['lines', 'classes'];
 
 try {
-    $reporter->process($coverage, 'coverage.json', $metrics);
+    // Missing parent directories of the target path are created automatically
+    $reporter->process($coverage, 'build/coverage.json', $metrics);
 } catch (\RuntimeException $e) {
     echo "Error generating report: " . $e->getMessage();
 }

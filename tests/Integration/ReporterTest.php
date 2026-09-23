@@ -51,12 +51,47 @@ class ReporterTest extends IntegrationTestCase
     }
 
     #[Test]
-    public function it_throws_on_unwritable_path(): void
+    public function it_creates_missing_output_directory(): void
     {
+        $baseDir = $this->outputDir . '/missing-' . uniqid();
+        $outputFile = $baseDir . '/nested/dir/coverage.json';
+        $this->assertDirectoryDoesNotExist($baseDir);
+
+        $reporter = new JsonReporter();
+        $reporter->process(self::$sharedMinimalCoverage, $outputFile);
+
+        $this->assertValidJsonReport($outputFile);
+
+        @unlink($outputFile);
+        @rmdir(dirname($outputFile));
+        @rmdir(dirname($outputFile, 2));
+        @rmdir($baseDir);
+    }
+
+    #[Test]
+    public function it_throws_when_output_directory_cannot_be_created(): void
+    {
+        // A regular file as parent makes mkdir() fail regardless of user privileges.
+        $blocker = $this->outputDir . '/blocker.json';
+        file_put_contents($blocker, '');
+        $directory = $blocker . '/sub';
+
         $reporter = new JsonReporter();
 
         $this->expectException(RuntimeException::class);
-        $reporter->process(self::$sharedMinimalCoverage, '/nonexistent/dir/that/cannot/exist/coverage.json');
+        $this->expectExceptionMessage(sprintf('Failed to create output directory "%s"', $directory));
+        $reporter->process(self::$sharedMinimalCoverage, $directory . '/coverage.json');
+    }
+
+    #[Test]
+    public function it_throws_when_output_file_cannot_be_written(): void
+    {
+        // Target is an existing directory, so file_put_contents() fails.
+        $reporter = new JsonReporter();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf('Failed to write coverage report to "%s"', $this->outputDir));
+        $reporter->process(self::$sharedMinimalCoverage, $this->outputDir);
     }
 
     #[Test]
@@ -119,9 +154,6 @@ class ReporterTest extends IntegrationTestCase
     public function it_supports_custom_output_path(): void
     {
         $customDir = $this->outputDir . '/custom/nested/dir';
-        if (!is_dir($customDir)) {
-            mkdir($customDir, 0777, true);
-        }
         $outputFile = $customDir . '/my-report.json';
 
         $reporter = new JsonReporter();

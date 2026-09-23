@@ -42,9 +42,9 @@ src/
 
 ```
 tests/
-├── Unit/           # 25 tests  — stubs/fakes, no real coverage data
-├── Feature/        # 49 tests  — real CodeCoverage from fixture files
-├── Integration/    # 25 tests  — full report generation end-to-end
+├── Unit/           # 26 tests  — stubs/fakes, no real coverage data
+├── Feature/        # 47 tests  — real CodeCoverage from fixture files
+├── Integration/    # 30 tests  — full report generation end-to-end
 ├── fixtures/       # PHP files exercised during tests
 └── bootstrap.php
 ```

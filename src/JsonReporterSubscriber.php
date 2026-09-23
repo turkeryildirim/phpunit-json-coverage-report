@@ -33,7 +33,7 @@ class JsonReporterSubscriber implements ExecutionFinishedSubscriber
      */
     public function notify(ExecutionFinished $event): void
     {
-        if (!class_exists(CodeCoverage::class) || !CodeCoverage::instance()->isActive()) {
+        if (!CodeCoverage::instance()->isActive()) {
             return;
         }
 
